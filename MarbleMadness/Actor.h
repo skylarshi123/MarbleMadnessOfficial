@@ -47,7 +47,7 @@ public:
     virtual int getAmmo() ;
     virtual void recieveAmmoCrate();
     virtual void decrementAmmo();
-    virtual void takeDamage() {decHealth(2);}
+    virtual void takeDamage() {decHealth(2); if(getHealth()<=0) setDead();}
     virtual bool canTakeDamage(){return true;}
     virtual bool canBeShot(){return true;}
 private:
@@ -135,9 +135,8 @@ public:
     virtual bool blockRobot() ;
     int getTick() ;
     void setTick(int tick);
-    virtual void takeDamage() {decHealth(2);}
+    virtual void takeDamage();
     virtual bool canTakeDamage(){return true;}
-
     virtual bool canBeShot(){return true;}
 private:
     int m_tick;
@@ -169,6 +168,10 @@ public:
     ThiefBot(double startX, double startY, StudentWorld* world, int health, int image);
     virtual void doSomething();
     virtual bool canSteal() {return true;}
+    virtual void takeDamage();
+    bool getHasPickedUpGoodie(){return hasPickedUpGoodie;}
+    Actor* getGoodie() {return goodie;}
+
 private:
     int distanceBeforeTurning;
     bool hasPickedUpGoodie;
@@ -179,6 +182,7 @@ class MeanThiefBot : public ThiefBot {
 public:
     MeanThiefBot(double startX, double startY, StudentWorld* world);
     virtual void doSomething();
+    virtual void takeDamage();
 };
 
 class RobotFactory: public Actor {

@@ -30,6 +30,7 @@ int StudentWorld::move()
     // This code is here merely to allow the game to build, run, and terminate after you type q
     if(m_levelComplete){
         m_levelComplete = false;
+        increaseScore(2000);
         return GWSTATUS_FINISHED_LEVEL;
     }
     setBonusPoints();

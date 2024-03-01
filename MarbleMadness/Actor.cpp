@@ -82,7 +82,6 @@ void Avatar::recieveAmmoCrate(){
 //move only if it empty or a non blocking actor
 void Avatar::doSomething() {
     if(isDead()) return;
-    if(getHealth()<=0) setDead();
     int predX = this->getX();
     int predY = this->getY();
     Actor* predActor;
@@ -119,6 +118,7 @@ void Avatar::doSomething() {
                 break;
             case KEY_PRESS_SPACE: {
                 if(this->getAmmo()<=0)break;
+                getWorld()->playSound(SOUND_PLAYER_FIRE);
                 this->decrementAmmo();
                 int currDirection = this->getDirection();
                 switch(currDirection){
@@ -242,7 +242,9 @@ void Crystal::doSomething(){
     avatarCollected = getWorld()->getAvatar();
     if (avatarCollected->getX() == this->getX() && avatarCollected->getY() == this->getY()){
         this->setDead();
+        getWorld()->playSound(SOUND_GOT_GOODIE);
         getWorld()->changeNumOfCrystals(-1);
+        getWorld()->increaseScore(50);
     }
 }
 
@@ -255,6 +257,8 @@ Exit::Exit(double startX, double startY, StudentWorld* world)
 void Exit::doSomething(){
     if(isVisible()){
         if(getX() == getWorld()->getAvatar()->getX() && getY() == getWorld()->getAvatar()->getY()){ //if player is there
+            getWorld()->increaseScore(getWorld()->getBonusPoints());
+            getWorld()->playSound(SOUND_FINISHED_LEVEL);
             getWorld()->finishedLevel();
             return;
         }
@@ -262,6 +266,7 @@ void Exit::doSomething(){
     }
     else if(getWorld()->getNumOfCrystals() == 0){
         this->setVisible(true);
+        getWorld()->playSound(SOUND_REVEAL_EXIT);
     }
     else  {
         return;
@@ -281,18 +286,25 @@ Goodies::Goodies(double startX, double startY, StudentWorld* world, int IID)
 RestoreHealthGoodies::RestoreHealthGoodies(double startX, double startY, StudentWorld* world) : Goodies(startX, startY, world, IID_RESTORE_HEALTH) {
 }
 void RestoreHealthGoodies::doSomething(){
+    if(isDead()) return;
     if(getX() == getWorld()->getAvatar()->getX() && getY() == getWorld()->getAvatar()->getY() && isVisible()){
         getWorld()->getAvatar()->restoreHealth();
+        getWorld()->playSound(SOUND_GOT_GOODIE);
         setDead();
+        getWorld()->increaseScore(500);
+
     }
 }
 
 AmmoGoodies::AmmoGoodies(double startX, double startY, StudentWorld* world) : Goodies(startX, startY, world, IID_AMMO) {
 }
 void AmmoGoodies::doSomething(){
+    if(isDead()) return;
     if(getX() == getWorld()->getAvatar()->getX() && getY() == getWorld()->getAvatar()->getY() &&isVisible()){
         getWorld()->getAvatar()->recieveAmmoCrate();
         setDead();
+        getWorld()->playSound(SOUND_GOT_GOODIE);
+        getWorld()->increaseScore(100);
     }
 }
 
@@ -301,9 +313,12 @@ ExtraLifeGoodies::ExtraLifeGoodies(double startX, double startY, StudentWorld* w
 {
 }
 void ExtraLifeGoodies::doSomething(){
+    if(isDead()) return;
     if(getX() == getWorld()->getAvatar()->getX() && getY() == getWorld()->getAvatar()->getY() &&isVisible()){
         getWorld()->getAvatar()->extraLife();
         setDead();
+        getWorld()->playSound(SOUND_GOT_GOODIE);
+        getWorld()->increaseScore(1000);
     }
 }
 
@@ -318,6 +333,16 @@ bool Robot::isBlocking(int direction){
 
 bool Robot::blockRobot() {
     return true;
+}
+
+void Robot::takeDamage() {
+    decHealth(2);
+    getWorld()->playSound(SOUND_ROBOT_IMPACT);
+    if(getHealth()<=0) {
+        setDead();
+        getWorld()->increaseScore(100);
+        getWorld()->playSound(SOUND_ROBOT_DIE);
+    }
 }
 
 RageBot::RageBot(double startX, double startY, StudentWorld* world, int direction)
@@ -358,7 +383,6 @@ HorizontalRageBot::HorizontalRageBot(double startX, double startY, StudentWorld*
 //flip direction if blocked, otherwise move in same trajectory
 void HorizontalRageBot::doSomething(){
     if(isDead()) return;
-    if(getHealth()<=0) setDead();
 
 
     if(this->getTick() == 1) {
@@ -413,7 +437,6 @@ VerticalRageBot::VerticalRageBot(double startX, double startY, StudentWorld* wor
 //same as horizontal but vertical
 void VerticalRageBot::doSomething(){
     if(isDead()) return;
-    if(getHealth()<=0) setDead();
 
     if(this->getTick() == 1) {
         Actor* predActor;
@@ -470,13 +493,6 @@ ThiefBot::ThiefBot(double startX, double startY, StudentWorld* world, int health
 
 void ThiefBot::doSomething(){
     if(isDead()) return;
-    if(getHealth()<=0){
-        if(hasPickedUpGoodie){
-            goodie->setVisible(true);
-            goodie->moveTo(getX(),getY());
-        }
-        setDead();
-    }
 
 
     if(this->getTick() == 1) {
@@ -494,6 +510,7 @@ void ThiefBot::doSomething(){
         if(predActor!=nullptr && predActor->isConsumable() && !hasPickedUpGoodie){
             int random = randInt(1,10);
             if(random==1){
+                getWorld()->playSound(SOUND_ROBOT_MUNCH);
                 hasPickedUpGoodie = true;
                 goodie = getWorld()->getActor(getX(), getY(), this);
                 if(goodie->isVisible()) goodie->setVisible(false); //goodie should be invisible
@@ -655,15 +672,36 @@ void RobotFactory::doSomething()
     }
 }
 
+void ThiefBot::takeDamage() {
+    decHealth(2);
+    if(getHealth()<=0){
+        if(hasPickedUpGoodie){
+            goodie->moveTo(getX(),getY());
+            goodie->setVisible(true);
+        }
+        setDead();
+        getWorld()->increaseScore(10);
+    }
+}
+
+void MeanThiefBot::takeDamage() {
+    decHealth(2);
+    if(getHealth()<=0){
+        if(getHasPickedUpGoodie()){
+            getGoodie()->moveTo(getX(),getY());
+            getGoodie()->setVisible(true);
+        }
+        setDead();
+        getWorld()->increaseScore(20);
+    }
+}
+
 Bullet::Bullet(double startX, double startY, StudentWorld* world, int direction) : Actor(IID_PEA, startX, startY, direction, world, 999){
     setVisible(true);
 }
 void Bullet::doSomething(){
     //if dead return immediately
     if(isDead())return;
-    if(isVisible()){
-        std::cout<<"HELLO!";
-    }
     Actor* predActor;
     Actor* Avatar = getWorld()->getAvatar();
     int predX = getX();
