@@ -92,7 +92,6 @@ void Avatar::doSomething() {
             case KEY_PRESS_LEFT:
                 setDirection(left);
                 predX-=1;
-
                 predActor = getWorld()->getActor(predX, predY, this);
                 if(predActor != nullptr && predActor->isBlocking(left)) break; //if not empty space and not blocking then you can move
                 this->moveTo(predX, predY);
