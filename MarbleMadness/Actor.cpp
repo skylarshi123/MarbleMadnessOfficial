@@ -667,6 +667,7 @@ void RobotFactory::doSomething()
         if (rand == 1) //1 in 50 chance that the factory makes a thief bot
         {
             int type1 = m_type;
+            getWorld()->playSound(SOUND_ROBOT_BORN);
             getWorld()->createThiefBot(type1, getX(), getY());
         }
     }
