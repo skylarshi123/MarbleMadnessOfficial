@@ -35,7 +35,6 @@ int StudentWorld::move()
     }
     setBonusPoints();
     setDisplayText();
-    m_avatar->doSomething();
     
 //    for(vector<Actor*>::iterator it = m_actors.begin(); it != m_actors.end();it++){
 //        //will auto check to see if dead, will only do something if alive
@@ -61,6 +60,8 @@ int StudentWorld::move()
             it++;
         }
     }
+    m_avatar->doSomething();
+
     
     
     return GWSTATUS_CONTINUE_GAME;

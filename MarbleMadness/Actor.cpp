@@ -628,7 +628,9 @@ void ThiefBot::doSomething(){
 MeanThiefBot::MeanThiefBot(double startX, double startY, StudentWorld* world) : ThiefBot(startX, startY, world, 8, IID_MEAN_THIEFBOT){
 };
 
-void MeanThiefBot::doSomething(){}
+void MeanThiefBot::doSomething(){
+    ThiefBot::doSomething();
+}
 
 RobotFactory::RobotFactory(double startX, double startY, StudentWorld* world, int type): Actor(IID_ROBOT_FACTORY, startX, startY, GraphObject::none, world, 999) {
     m_type = type;
