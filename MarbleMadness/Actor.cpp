@@ -674,24 +674,28 @@ void RobotFactory::doSomething()
 
 void ThiefBot::takeDamage() {
     decHealth(2);
+    getWorld()->playSound(SOUND_ROBOT_IMPACT);
     if(getHealth()<=0){
         if(hasPickedUpGoodie){
             goodie->moveTo(getX(),getY());
             goodie->setVisible(true);
         }
         setDead();
+        getWorld()->playSound(SOUND_ROBOT_DIE);
         getWorld()->increaseScore(10);
     }
 }
 
 void MeanThiefBot::takeDamage() {
     decHealth(2);
+    getWorld()->playSound(SOUND_ROBOT_IMPACT);
     if(getHealth()<=0){
         if(getHasPickedUpGoodie()){
             getGoodie()->moveTo(getX(),getY());
             getGoodie()->setVisible(true);
         }
         setDead();
+        getWorld()->playSound(SOUND_ROBOT_DIE);
         getWorld()->increaseScore(20);
     }
 }
