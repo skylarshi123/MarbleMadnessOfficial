@@ -95,6 +95,15 @@ int StudentWorld::loadLevel()
     string curLevel = "level" + levelnum + ".txt";
     Level lev(assetPath());
     Level::LoadResult result = lev.loadLevel(curLevel);
+    if (result == Level::load_fail_file_not_found || levelnum == "100") //if file not found or at level 100 then you won
+        {
+            return GWSTATUS_PLAYER_WON;
+        }
+
+        if (result == Level::load_fail_bad_format)
+        {
+            return GWSTATUS_LEVEL_ERROR; // something bad happened!
+        }
 if (result == Level::load_fail_file_not_found || result == Level:: load_fail_bad_format)
     return -1; // something bad happened!
 // otherwise the load was successful and you can access the
