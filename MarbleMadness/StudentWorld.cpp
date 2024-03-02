@@ -21,25 +21,16 @@ StudentWorld::StudentWorld(string assetPath)
 
 int StudentWorld::init()
 {
-    loadLevel();
+    int result = loadLevel();
+    if(result != 1) return result;
     return GWSTATUS_CONTINUE_GAME;
 }
 
 int StudentWorld::move()
 {
     // This code is here merely to allow the game to build, run, and terminate after you type q
-    if(m_levelComplete){
-        m_levelComplete = false;
-        increaseScore(2000);
-        resetBonusPoints();
-        return GWSTATUS_FINISHED_LEVEL;
-    }
     
-    if(getAvatar()->isDead()) {
-        numOfCrystals = 0;
-        return GWSTATUS_PLAYER_DIED;
-    }
-    setBonusPoints();
+
     setDisplayText();
     
 //    for(vector<Actor*>::iterator it = m_actors.begin(); it != m_actors.end();it++){
@@ -52,10 +43,31 @@ int StudentWorld::move()
     int n = m_actors.size();
 
     for (int i = 0; i < n; i++) {
-        if (m_actors[i] == nullptr) cout << "balls";
-        else m_actors[i]->doSomething();
+            m_actors[i]->doSomething();
+            if(getAvatar()->isDead()) {
+                numOfCrystals = 0;
+                return GWSTATUS_PLAYER_DIED;
+            }
+            
+            if(m_levelComplete){
+                m_levelComplete = false;
+                increaseScore(2000);
+                resetBonusPoints();
+                return GWSTATUS_FINISHED_LEVEL;
+            }
+    }
+    m_avatar->doSomething();
+    if(getAvatar()->isDead()) {
+        numOfCrystals = 0;
+        return GWSTATUS_PLAYER_DIED;
     }
     
+    if(m_levelComplete){
+        m_levelComplete = false;
+        increaseScore(2000);
+        resetBonusPoints();
+        return GWSTATUS_FINISHED_LEVEL;
+    }
     //delete if dead
     for(vector<Actor*>::iterator it = m_actors.begin(); it != m_actors.end();){
         if((*it)->isDead()){
@@ -66,9 +78,9 @@ int StudentWorld::move()
             it++;
         }
     }
-    m_avatar->doSomething();
+    setBonusPoints();
 
-    
+
     
     return GWSTATUS_CONTINUE_GAME;
 }
@@ -104,11 +116,11 @@ int StudentWorld::loadLevel()
             return GWSTATUS_PLAYER_WON;
         }
 
-        if (result == Level::load_fail_bad_format)
+    if (result == Level::load_fail_bad_format)
         {
             return GWSTATUS_LEVEL_ERROR; // something bad happened!
         }
-if (result == Level::load_fail_file_not_found || result == Level:: load_fail_bad_format)
+    if (result == Level::load_fail_file_not_found || result == Level:: load_fail_bad_format)
     return -1; // something bad happened!
 // otherwise the load was successful and you can access the
 // contents of the level – here’s an example
