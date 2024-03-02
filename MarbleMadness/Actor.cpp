@@ -664,15 +664,19 @@ void ThiefBot::doSomething(){
             
             switch(currDirection){
                 case up:
+                    std::cerr<<"right";
                     currDirection = left;
                     break;
                 case left:
+                    std::cerr<<"left";
                     currDirection = down;
                     break;
                 case down:
+                    std::cerr<<"up";
                     currDirection = right;
                     break;
                 case right:
+                    std::cerr<<"down";
                     currDirection = up;
                     break;
             }
