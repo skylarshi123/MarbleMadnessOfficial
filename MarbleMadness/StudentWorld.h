@@ -13,7 +13,7 @@ public:
     virtual int init();
     virtual int move();
     virtual void cleanUp();
-    bool canMoveTo(double x, double y);
+    bool canMoveTo(double x, double y) const;
     virtual ~StudentWorld();
     Actor* getActor(int x, int y, Actor* actor) const;
     Actor* getActorThatCanBeShot(int x, int y, Actor* actor) const;
