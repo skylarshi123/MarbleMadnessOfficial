@@ -33,8 +33,11 @@ int StudentWorld::move()
         increaseScore(2000);
         return GWSTATUS_FINISHED_LEVEL;
     }
-    if(getAvatar()->isDead()) return GWSTATUS_PLAYER_DIED;
-
+    
+    if(getAvatar()->isDead()) {
+        numOfCrystals = 0;
+        return GWSTATUS_PLAYER_DIED;
+    }
     setBonusPoints();
     setDisplayText();
     
