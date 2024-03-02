@@ -161,6 +161,12 @@ Actor* StudentWorld::getActor(int x, int y, Actor* actor) const{
 
 Actor* StudentWorld::getActorThatCanBeShot(int x, int y, Actor* actor) const{
     //prioritize getting the things that can take Damage
+    
+    if(m_avatar->getX() == x && m_avatar->getY() == y)
+    {
+        return m_avatar;
+    }
+    
     for (vector<Actor*>::const_iterator it = m_actors.begin(); it != m_actors.end(); ++it) {
         if ((*it)->getX() == x && (*it)->getY() == y && (*it) != actor && (*it)->canTakeDamage()) {
             return *it;
@@ -181,7 +187,6 @@ Actor* StudentWorld::getActorThatCanBeShot(int x, int y, Actor* actor) const{
     // No actor found at the specified (x, y) location
     return nullptr;
 }
-
 
 int StudentWorld::getCountThiefBot(int x, int y) const{
     int count = 0;

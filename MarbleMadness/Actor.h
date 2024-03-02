@@ -31,7 +31,7 @@ public:
     virtual void takeDamage() {}
     virtual bool canTakeDamage(){return false;}
     virtual bool canBeShot(){return false;}
-
+    virtual bool blockRobotVision(){return false;}
 private:
     StudentWorld* m_world;
     bool m_dead = false;
@@ -62,6 +62,7 @@ public:
     virtual bool isBlocking(int direction);
     virtual bool blockRobot() ;
     virtual bool canBeShot(){return true;}
+    virtual bool blockRobotVision(){return true;}
 };
 
 //Marble class declaration
@@ -74,7 +75,7 @@ public:
     virtual void takeDamage() {decHealth(2);}
     virtual bool canBeShot(){return true;}
     virtual bool canTakeDamage(){return true;}
-
+    virtual bool blockRobotVision(){return true;}
 };
 
 //Pit class declaration
@@ -138,7 +139,10 @@ public:
     virtual void takeDamage();
     virtual bool canTakeDamage(){return true;}
     virtual bool canBeShot(){return true;}
+    virtual bool blockRobotVision(){return true;}
+    void executeShot();
 private:
+    bool shootPlayer();
     int m_tick;
 };
 
@@ -192,6 +196,7 @@ public:
     virtual bool isBlocking(int direction){return true;}
     virtual bool blockRobot()  {return true;}
     virtual bool canBeShot(){return true;}
+    virtual bool blockRobotVision(){return true;}
 private:
     int m_type;
 };

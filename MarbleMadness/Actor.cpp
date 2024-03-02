@@ -341,7 +341,72 @@ void Robot::takeDamage() {
     if(getHealth()<=0) {
         setDead();
         getWorld()->increaseScore(100);
+        
         getWorld()->playSound(SOUND_ROBOT_DIE);
+    }
+}
+
+bool Robot::shootPlayer(){
+    int currentDirection = getDirection();
+    int robotX = getX();
+    int robotY = getY();
+    Actor* predActor;
+    for(int i = 0;i<14;i++){
+        //get all the
+        switch(currentDirection){
+            case up:
+                robotY++;
+                break;
+            case left:
+                robotX--;
+                break;
+            case right:
+                robotX++;
+                break;
+            case down:
+                robotY--;
+                break;
+        }
+        //call function with this x and y to see if something is there in the way
+        predActor = getWorld()->getActorThatCanBeShot(robotX, robotY, this);
+        if(predActor == getWorld()->getAvatar())return true;
+        if(predActor != nullptr){
+            if(getWorld()->getActor(robotX, robotY, this)->canBeShot()) return false;
+        }
+    }
+    return true;
+}
+
+void Robot::executeShot(){
+    if(this->getTick() == 1) {
+        int currDirection = this->getDirection();
+        int predX = getX();
+        int predY = getY();
+        if(Robot::shootPlayer()){
+            switch(currDirection){
+                case up:
+                    predX = getX();
+                    predY = getY()+1;
+                    break;
+                case left:
+                    predX = getX()-1;
+                    predY = getY();
+                    break;
+                case down:
+                    predX = getX();
+                    predY = getY()-1;
+                    break;
+                case right:
+                    predX = getX()+1;
+                    predY = getY();
+                    break;
+            }
+            getWorld()->createBullet(predX, predY, currDirection);
+            getWorld()->playSound(SOUND_ENEMY_FIRE);
+            int levelNumber = getWorld()->getLevel();
+            this->setTick((28 - levelNumber) / 4);
+            return;
+        }
     }
 }
 
@@ -376,15 +441,9 @@ void RageBot::flipDirection(int direction){
     }
 }
 
-HorizontalRageBot::HorizontalRageBot(double startX, double startY, StudentWorld* world)
-: RageBot(startX, startY, world, right) {
-    
-}
-//flip direction if blocked, otherwise move in same trajectory
-void HorizontalRageBot::doSomething(){
+void RageBot::doSomething(){
     if(isDead()) return;
-
-
+    Robot::executeShot();
     if(this->getTick() == 1) {
         Actor* predActor;
         Actor* Avatar;
@@ -421,33 +480,6 @@ void HorizontalRageBot::doSomething(){
                 }
                 else this->flipDirection(currDirection);
                 break;
-        }
-        int levelNumber = getWorld()->getLevel();
-        this->setTick((28 - levelNumber) / 4);
-    }
-    else {
-        this->setTick((this->getTick())-1);
-    }
-}
-
-VerticalRageBot::VerticalRageBot(double startX, double startY, StudentWorld* world)
-: RageBot(startX, startY, world, down) {
-    
-}
-//same as horizontal but vertical
-void VerticalRageBot::doSomething(){
-    if(isDead()) return;
-
-    if(this->getTick() == 1) {
-        Actor* predActor;
-        Actor* Avatar;
-        int currDirection = this->getDirection();
-        int predX = getX();
-        int predY = getY();
-        Avatar = getWorld()->getAvatar();
-        int avatarX = Avatar->getX();
-        int avatarY = Avatar->getY();
-        switch(currDirection){
             case(up):
                 predY++;
                 predActor = getWorld()->getActor(predX, predY, this);
@@ -483,6 +515,24 @@ void VerticalRageBot::doSomething(){
     }
 }
 
+HorizontalRageBot::HorizontalRageBot(double startX, double startY, StudentWorld* world)
+: RageBot(startX, startY, world, right) {
+    
+}
+//flip direction if blocked, otherwise move in same trajectory
+void HorizontalRageBot::doSomething(){
+    RageBot::doSomething();
+}
+
+VerticalRageBot::VerticalRageBot(double startX, double startY, StudentWorld* world)
+: RageBot(startX, startY, world, down) {
+    
+}
+//same as horizontal but vertical
+void VerticalRageBot::doSomething(){
+    RageBot::doSomething();
+}
+
 ThiefBot::ThiefBot(double startX, double startY, StudentWorld* world, int health, int image) :
     Robot(startX, startY, world, image, right, health){
         distanceBeforeTurning = randInt(1, 6);
@@ -493,8 +543,6 @@ ThiefBot::ThiefBot(double startX, double startY, StudentWorld* world, int health
 
 void ThiefBot::doSomething(){
     if(isDead()) return;
-
-
     if(this->getTick() == 1) {
         Actor* predActor;
         Actor* Avatar;
@@ -629,6 +677,7 @@ MeanThiefBot::MeanThiefBot(double startX, double startY, StudentWorld* world) : 
 };
 
 void MeanThiefBot::doSomething(){
+    Robot::executeShot();
     ThiefBot::doSomething();
 }
 
