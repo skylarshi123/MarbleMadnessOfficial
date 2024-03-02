@@ -78,6 +78,16 @@ void Avatar::recieveAmmoCrate(){
     m_ammo = m_ammo + 20;
 }
 
+void Avatar::takeDamage(){
+    decHealth(2);
+    getWorld()->playSound(SOUND_PLAYER_IMPACT);
+    if(getHealth()<=0) {
+        getWorld()->decLives();
+        setDead();
+        getWorld()->playSound(SOUND_PLAYER_DIE);
+    }
+    
+}
 
 //move only if it empty or a non blocking actor
 void Avatar::doSomething() {
@@ -143,6 +153,8 @@ void Avatar::doSomething() {
                 break;
             }
             case KEY_PRESS_ESCAPE:
+                getWorld()->decLives();
+                setDead();
                 break;
         }
     }

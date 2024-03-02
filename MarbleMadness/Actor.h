@@ -47,9 +47,9 @@ public:
     virtual int getAmmo() ;
     virtual void recieveAmmoCrate();
     virtual void decrementAmmo();
-    virtual void takeDamage() {decHealth(2); if(getHealth()<=0) setDead();}
     virtual bool canTakeDamage(){return true;}
     virtual bool canBeShot(){return true;}
+    virtual void takeDamage();
 private:
     int m_ammo = 20;
 };
