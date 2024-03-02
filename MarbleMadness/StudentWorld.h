@@ -24,6 +24,7 @@ public:
     int getNumOfCrystals() const;
     void changeNumOfCrystals(int num);
     void setBonusPoints();
+    void resetBonusPoints();
     int getBonusPoints() const {return m_BonusPoints;}
     void finishedLevel();
     void createBullet(int x, int y, int direction);

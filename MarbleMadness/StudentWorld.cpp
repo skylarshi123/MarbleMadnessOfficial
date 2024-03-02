@@ -31,6 +31,7 @@ int StudentWorld::move()
     if(m_levelComplete){
         m_levelComplete = false;
         increaseScore(2000);
+        resetBonusPoints();
         return GWSTATUS_FINISHED_LEVEL;
     }
     
@@ -256,6 +257,9 @@ string StudentWorld::someFunctionToFormatThingsNicely(int score, int level, int 
     oss.fill(' ');
     oss << "  Lives: " << setw(2) << lives << "  Health: " << setw(3) << health <<"%" << "  Ammo: " << setw(3) << ammo << setw(4) << "  Bonus: "<<bonus;
     return oss.str();
+}
+void StudentWorld::resetBonusPoints(){
+    m_BonusPoints = 1000;
 }
 
 void StudentWorld::setBonusPoints(){

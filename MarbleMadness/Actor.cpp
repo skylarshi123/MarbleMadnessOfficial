@@ -16,11 +16,11 @@ bool Actor::isBlocking(int direction){
     return false;
 }
 
-bool Actor::blockRobot(){
+bool Actor::blockRobot() const{
     return false;
 }
 
-bool Actor::isPushableInto() {
+bool Actor::isPushableInto() const{
     return false;
 }
 
@@ -28,7 +28,7 @@ void Actor::setDead(){
     m_dead = true;
 }
 
-bool Actor::isDead() {
+bool Actor::isDead() const{
     return m_dead;
 }
 
@@ -40,11 +40,11 @@ void Actor::decHealth(int decrement){
     m_health-=decrement;
 }
 
-int Actor::getHealth() {
+int Actor::getHealth() const{
     return m_health*5;
 }
 
-int Actor::getAmmo() {
+int Actor::getAmmo() const{
     return 0;
 }
 
@@ -62,11 +62,11 @@ Avatar::Avatar(double startX, double startY, StudentWorld* world)
         setVisible(true);
 }
 
-bool Avatar::blockRobot() {
+bool Avatar::blockRobot() const{
     return true;
 }
 
-int Avatar::getAmmo() {
+int Avatar::getAmmo() const{
     return m_ammo;
 }
 
@@ -169,7 +169,7 @@ bool Wall::isBlocking(int direction){
     return true;
 }
 
-bool Wall::blockRobot() {
+bool Wall::blockRobot() const{
     return true;
 }
 
@@ -207,7 +207,7 @@ bool Marble::isBlocking(int direction){
     return false;
 }
 
-bool Marble::blockRobot() {
+bool Marble::blockRobot() const{
     return true;
 }
 
@@ -226,7 +226,7 @@ bool Pit::isBlocking(int direction){
     return true;
 }
 
-bool Pit::blockRobot() {
+bool Pit::blockRobot() const{
     return true;
 }
 
@@ -240,7 +240,7 @@ void Pit::doSomething(){
     }
 }
 
-bool Pit::isPushableInto() {
+bool Pit::isPushableInto() const{
     return true;
 }
 
@@ -343,7 +343,7 @@ bool Robot::isBlocking(int direction){
     return true;
 }
 
-bool Robot::blockRobot() {
+bool Robot::blockRobot() const{
     return true;
 }
 

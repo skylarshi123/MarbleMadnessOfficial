@@ -12,26 +12,26 @@ public:
     Actor(int imageID, double startX, double startY, int startDirection, StudentWorld* world, int health);
     virtual void doSomething() = 0; // Pure virtual function
     void decHealth(int decrement);
-    int getHealth();
-    StudentWorld* getWorld() ;
+    int getHealth()const;
+    StudentWorld* getWorld();
     virtual bool isBlocking(int direction);
-    virtual bool blockRobot() ;
-    virtual bool isPushableInto() ;
+    virtual bool blockRobot() const;
+    virtual bool isPushableInto() const;
     void setDead();
-    bool isDead() ;
-    virtual int getAmmo() ;
+    bool isDead() const;
+    virtual int getAmmo() const;
     virtual void decrementAmmo();
     virtual void recieveAmmoCrate();
     void restoreHealth();
     void extraLife();
-    virtual bool isConsumable() { return false;}
-    virtual bool canSteal() {return false;}
-    virtual bool isEnemy()  {return false;}
-    virtual bool hiddenExistance() {return false;}
+    virtual bool isConsumable() const { return false;}
+    virtual bool canSteal() const {return false;}
+    virtual bool isEnemy() const  {return false;}
+    virtual bool hiddenExistance() const {return false;}
     virtual void takeDamage() {}
-    virtual bool canTakeDamage(){return false;}
-    virtual bool canBeShot(){return false;}
-    virtual bool blockRobotVision(){return false;}
+    virtual bool canTakeDamage() const{return false;}
+    virtual bool canBeShot() const{return false;}
+    virtual bool blockRobotVision() const{return false;}
 private:
     StudentWorld* m_world;
     bool m_dead = false;
@@ -43,12 +43,12 @@ class Avatar : public Actor {
 public:
     Avatar(double startX, double startY, StudentWorld* world);
     virtual void doSomething(); // Implementation of Avatar's actions
-    virtual bool blockRobot() ;
-    virtual int getAmmo() ;
+    virtual bool blockRobot() const ;
+    virtual int getAmmo() const;
     virtual void recieveAmmoCrate();
     virtual void decrementAmmo();
-    virtual bool canTakeDamage(){return true;}
-    virtual bool canBeShot(){return true;}
+    virtual bool canTakeDamage() const{return true;}
+    virtual bool canBeShot() const{return true;}
     virtual void takeDamage();
 private:
     int m_ammo = 20;
@@ -60,9 +60,9 @@ public:
     Wall(double startX, double startY, StudentWorld* world);
     virtual void doSomething();
     virtual bool isBlocking(int direction);
-    virtual bool blockRobot() ;
-    virtual bool canBeShot(){return true;}
-    virtual bool blockRobotVision(){return true;}
+    virtual bool blockRobot() const ;
+    virtual bool canBeShot() const{return true;}
+    virtual bool blockRobotVision() const{return true;}
 };
 
 //Marble class declaration
@@ -71,11 +71,11 @@ public:
     Marble(double startX, double startY, StudentWorld* world);
     virtual void doSomething();
     virtual bool isBlocking(int direction);
-    virtual bool blockRobot() ;
+    virtual bool blockRobot() const ;
     virtual void takeDamage() {decHealth(2);}
-    virtual bool canBeShot(){return true;}
-    virtual bool canTakeDamage(){return true;}
-    virtual bool blockRobotVision(){return true;}
+    virtual bool canBeShot() const{return true;}
+    virtual bool canTakeDamage() const{return true;}
+    virtual bool blockRobotVision() const{return true;}
 };
 
 //Pit class declaration
@@ -84,8 +84,8 @@ public:
     Pit(double startX, double startY, StudentWorld* world);
     virtual void doSomething();
     virtual bool isBlocking(int direction);
-    virtual bool isPushableInto() ;
-    virtual bool blockRobot() ;
+    virtual bool isPushableInto() const;
+    virtual bool blockRobot() const ;
 
 };
 
@@ -99,14 +99,14 @@ class Exit : public Actor {
 public:
     Exit(double startX, double startY, StudentWorld* world);
     virtual void doSomething();
-    virtual bool hiddenExistance() {return true;}
+    virtual bool hiddenExistance() const {return true;}
 };
 
 class Goodies : public Actor {
 public:
     Goodies(double startX, double startY, StudentWorld* world, int IID);
     virtual void doSomething() = 0; // Pure virtual function
-    virtual bool isConsumable() { return true;}
+    virtual bool isConsumable() const { return true;}
 };
 
 class RestoreHealthGoodies : public Goodies {
@@ -132,14 +132,14 @@ public:
     Robot(double startX, double startY, StudentWorld* world, int IID, int direction, int health);
     virtual void doSomething() = 0; // Pure virtual function
     bool isBlocking(int direction);
-    virtual bool isEnemy() {return true;}
-    virtual bool blockRobot() ;
+    virtual bool isEnemy() const {return true;}
+    virtual bool blockRobot() const ;
     int getTick() ;
     void setTick(int tick);
     virtual void takeDamage();
-    virtual bool canTakeDamage(){return true;}
-    virtual bool canBeShot(){return true;}
-    virtual bool blockRobotVision(){return true;}
+    virtual bool canTakeDamage() const{return true;}
+    virtual bool canBeShot() const{return true;}
+    virtual bool blockRobotVision() const{return true;}
     void executeShot();
 private:
     bool shootPlayer();
@@ -171,7 +171,7 @@ class ThiefBot : public Robot {
 public:
     ThiefBot(double startX, double startY, StudentWorld* world, int health, int image);
     virtual void doSomething();
-    virtual bool canSteal() {return true;}
+    virtual bool canSteal() const {return true;}
     virtual void takeDamage();
     bool getHasPickedUpGoodie(){return hasPickedUpGoodie;}
     Actor* getGoodie() {return goodie;}
@@ -194,9 +194,9 @@ public:
     RobotFactory(double startX, double startY, StudentWorld* world, int type);
     virtual void doSomething();
     virtual bool isBlocking(int direction){return true;}
-    virtual bool blockRobot()  {return true;}
-    virtual bool canBeShot(){return true;}
-    virtual bool blockRobotVision(){return true;}
+    virtual bool blockRobot() const  {return true;}
+    virtual bool canBeShot() const{return true;}
+    virtual bool blockRobotVision() const{return true;}
 private:
     int m_type;
 };
