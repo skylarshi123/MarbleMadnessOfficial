@@ -55,6 +55,23 @@ void Actor::extraLife(){
 void Actor::restoreHealth(){
     m_health = 20;
 }
+//this is a function used to not duplicate
+void Actor::changeCoordinates(int &predX, int &predY, int direction){
+    switch(direction){
+        case right:
+            predX++;
+            break;
+        case left:
+            predX--;
+            break;
+        case up:
+            predY++;
+            break;
+        case down:
+            predY--;
+            break;
+    }
+}
 
 // Avatar class implementation
 Avatar::Avatar(double startX, double startY, StudentWorld* world)
@@ -88,6 +105,9 @@ void Avatar::takeDamage(){
     }
     
 }
+
+
+
 
 //move only if it empty or a non blocking actor
 void Avatar::doSomething() {
@@ -130,26 +150,10 @@ void Avatar::doSomething() {
                 if(this->getAmmo()<=0)break;
                 getWorld()->playSound(SOUND_PLAYER_FIRE);
                 this->decrementAmmo();
-                int currDirection = this->getDirection();
-                switch(currDirection){
-                    case up:
-                        predX = getX();
-                        predY = getY()+1;
-                        break;
-                    case left:
-                        predX = getX()-1;
-                        predY = getY();
-                        break;
-                    case down:
-                        predX = getX();
-                        predY = getY()-1;
-                        break;
-                    case right:
-                        predX = getX()+1;
-                        predY = getY();
-                        break;
-                }
-                getWorld()->createBullet(predX, predY, currDirection);
+                predX = getX();
+                predY = getY();
+                changeCoordinates(predX, predY, getDirection());
+                getWorld()->createBullet(predX, predY, getDirection());
                 break;
             }
             case KEY_PRESS_ESCAPE:
@@ -185,20 +189,7 @@ bool Marble::isBlocking(int direction){
     int predX = this->getX();
     int predY = this->getY();
     Actor* predActor;
-    switch(direction){
-        case right:
-            predX++;
-            break;
-        case left:
-            predX--;
-            break;
-        case up:
-            predY++;
-            break;
-        case down:
-            predY--;
-            break;
-    }
+    changeCoordinates(predX, predY, direction);
     predActor = getWorld()->getActor(predX, predY, this);
     if(predActor != nullptr && predActor->isPushableInto() == false){
         return true;
@@ -267,7 +258,7 @@ Exit::Exit(double startX, double startY, StudentWorld* world)
 
 
 void Exit::doSomething(){
-    if(isVisible()){
+    if(m_isOpen){
         if(getX() == getWorld()->getAvatar()->getX() && getY() == getWorld()->getAvatar()->getY()){ //if player is there
             getWorld()->increaseScore(getWorld()->getBonusPoints());
             getWorld()->playSound(SOUND_FINISHED_LEVEL);
@@ -278,6 +269,7 @@ void Exit::doSomething(){
     }
     else if(getWorld()->getNumOfCrystals() == 0){
         this->setVisible(true);
+        m_isOpen = true;
         getWorld()->playSound(SOUND_REVEAL_EXIT);
     }
     else  {
@@ -297,9 +289,10 @@ Goodies::Goodies(double startX, double startY, StudentWorld* world, int IID)
 
 RestoreHealthGoodies::RestoreHealthGoodies(double startX, double startY, StudentWorld* world) : Goodies(startX, startY, world, IID_RESTORE_HEALTH) {
 }
+//I would not consider the goodie Do Something's duplicate because they call a specific function for each specialization
 void RestoreHealthGoodies::doSomething(){
     if(isDead()) return;
-    if(getX() == getWorld()->getAvatar()->getX() && getY() == getWorld()->getAvatar()->getY() && isVisible()){
+    if(getX() == getWorld()->getAvatar()->getX() && getY() == getWorld()->getAvatar()->getY() && getRobbed()==false){
         getWorld()->getAvatar()->restoreHealth();
         getWorld()->playSound(SOUND_GOT_GOODIE);
         setDead();
@@ -312,7 +305,7 @@ AmmoGoodies::AmmoGoodies(double startX, double startY, StudentWorld* world) : Go
 }
 void AmmoGoodies::doSomething(){
     if(isDead()) return;
-    if(getX() == getWorld()->getAvatar()->getX() && getY() == getWorld()->getAvatar()->getY() &&isVisible()){
+    if(getX() == getWorld()->getAvatar()->getX() && getY() == getWorld()->getAvatar()->getY() && getRobbed()==false){
         getWorld()->getAvatar()->recieveAmmoCrate();
         setDead();
         getWorld()->playSound(SOUND_GOT_GOODIE);
@@ -326,7 +319,7 @@ ExtraLifeGoodies::ExtraLifeGoodies(double startX, double startY, StudentWorld* w
 }
 void ExtraLifeGoodies::doSomething(){
     if(isDead()) return;
-    if(getX() == getWorld()->getAvatar()->getX() && getY() == getWorld()->getAvatar()->getY() &&isVisible()){
+    if(getX() == getWorld()->getAvatar()->getX() && getY() == getWorld()->getAvatar()->getY() && getRobbed()==false){
         getWorld()->getAvatar()->extraLife();
         setDead();
         getWorld()->playSound(SOUND_GOT_GOODIE);
@@ -365,20 +358,7 @@ bool Robot::shootPlayer(){
     Actor* predActor;
     for(int i = 0;i<14;i++){
         //get all the
-        switch(currentDirection){
-            case up:
-                robotY++;
-                break;
-            case left:
-                robotX--;
-                break;
-            case right:
-                robotX++;
-                break;
-            case down:
-                robotY--;
-                break;
-        }
+        changeCoordinates(robotX, robotY, currentDirection);
         //call function with this x and y to see if something is there in the way
         predActor = getWorld()->getActorThatCanBeShot(robotX, robotY, this);
         if(predActor == getWorld()->getAvatar())return true;
@@ -395,24 +375,7 @@ void Robot::executeShot(){
         int predX = getX();
         int predY = getY();
         if(Robot::shootPlayer()){
-            switch(currDirection){
-                case up:
-                    predX = getX();
-                    predY = getY()+1;
-                    break;
-                case left:
-                    predX = getX()-1;
-                    predY = getY();
-                    break;
-                case down:
-                    predX = getX();
-                    predY = getY()-1;
-                    break;
-                case right:
-                    predX = getX()+1;
-                    predY = getY();
-                    break;
-            }
+            changeCoordinates(predX, predY, currDirection);
             getWorld()->createBullet(predX, predY, currDirection);
             getWorld()->playSound(SOUND_ENEMY_FIRE);
             int levelNumber = getWorld()->getLevel();
@@ -573,7 +536,10 @@ void ThiefBot::doSomething(){
                 getWorld()->playSound(SOUND_ROBOT_MUNCH);
                 hasPickedUpGoodie = true;
                 goodie = getWorld()->getActor(getX(), getY(), this);
-                if(goodie->isVisible()) goodie->setVisible(false); //goodie should be invisible
+                if(goodie->getRobbed()==false) {
+                    goodie->setRobbed(true);
+                    goodie->setVisible(false);
+                }//goodie should be invisible
                 this->setTick((28 - levelNumber) / 4);
                 return;
             }
@@ -581,20 +547,7 @@ void ThiefBot::doSomething(){
         
         if(distanceBeforeTurning > 0){
             distanceBeforeTurning--;
-            switch(currDirection){
-                case up:
-                    predY++;
-                    break;
-                case down:
-                    predY--;
-                    break;
-                case left:
-                    predX--;
-                    break;
-                case right:
-                    predX++;
-                    break;
-            }
+            changeCoordinates(predX, predY, currDirection);
             predActor = getWorld()->getActor(predX, predY, this);
             if(predActor==nullptr && (avatarX != predX || avatarY != predY)){
                 moveTo(predX, predY);
@@ -627,24 +580,9 @@ void ThiefBot::doSomething(){
         }
         setDirection(currDirection);
         for(int i = 1; i<=4; i++){
-            switch(currDirection){
-                case up:
-                    predX = getX();
-                    predY = getY()+1;
-                    break;
-                case left:
-                    predX = getX()-1;
-                    predY = getY();
-                    break;
-                case down:
-                    predX = getX();
-                    predY = getY()-1;
-                    break;
-                case right:
-                    predX = getX()+1;
-                    predY = getY();
-                    break;
-            }
+            predX = getX();
+            predY = getY();
+            changeCoordinates(predX, predY, currDirection);
             
             predActor = getWorld()->getActor(predX, predY, this);
             if(predActor==nullptr && (avatarX != predX || avatarY != predY)){
@@ -694,7 +632,7 @@ void MeanThiefBot::doSomething(){
 }
 
 RobotFactory::RobotFactory(double startX, double startY, StudentWorld* world, int type): Actor(IID_ROBOT_FACTORY, startX, startY, GraphObject::none, world, 999) {
-    m_type = type;
+    m_meaness = type;
     //Get bounds of factory (0 - 14) for both sides x & y
     setVisible(true);
 }
@@ -729,39 +667,34 @@ void RobotFactory::doSomething()
         int rand = randInt(1, 50);
         if (rand == 1) //1 in 50 chance that the factory makes a thief bot
         {
-            int type1 = m_type;
+            int type1 = m_meaness;
             getWorld()->playSound(SOUND_ROBOT_BORN);
             getWorld()->createThiefBot(type1, getX(), getY());
         }
     }
 }
-
-void ThiefBot::takeDamage() {
+void ThiefBot::takeDamageHelper(int increaseScore){
     decHealth(2);
     getWorld()->playSound(SOUND_ROBOT_IMPACT);
     if(getHealth()<=0){
         if(hasPickedUpGoodie){
             goodie->moveTo(getX(),getY());
             goodie->setVisible(true);
+            goodie->setRobbed(false);
         }
         setDead();
         getWorld()->playSound(SOUND_ROBOT_DIE);
-        getWorld()->increaseScore(10);
+        getWorld()->increaseScore(increaseScore);
     }
 }
 
+//this is not really code duplication because diff score
+void ThiefBot::takeDamage() {
+    takeDamageHelper(10);
+}
+
 void MeanThiefBot::takeDamage() {
-    decHealth(2);
-    getWorld()->playSound(SOUND_ROBOT_IMPACT);
-    if(getHealth()<=0){
-        if(getHasPickedUpGoodie()){
-            getGoodie()->moveTo(getX(),getY());
-            getGoodie()->setVisible(true);
-        }
-        setDead();
-        getWorld()->playSound(SOUND_ROBOT_DIE);
-        getWorld()->increaseScore(20);
-    }
+    takeDamageHelper(20);
 }
 
 Bullet::Bullet(double startX, double startY, StudentWorld* world, int direction) : Actor(IID_PEA, startX, startY, direction, world, 999){
@@ -791,24 +724,9 @@ void Bullet::doSomething(){
         return;
     }
 //    else pea can pas over it
-    switch(currDirection){
-        case up:
-            predX = getX();
-            predY = getY()+1;
-            break;
-        case left:
-            predX = getX()-1;
-            predY = getY();
-            break;
-        case down:
-            predX = getX();
-            predY = getY()-1;
-            break;
-        case right:
-            predX = getX()+1;
-            predY = getY();
-            break;
-    }
+    predX = getX();
+    predY = getY();
+    changeCoordinates(predX, predY, currDirection);
         moveTo(predX, predY);
         predActor = getWorld()->getActorThatCanBeShot(predX, predY, this);
         if(predActor != nullptr && predActor->canBeShot()){

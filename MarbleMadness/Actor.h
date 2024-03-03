@@ -33,10 +33,14 @@ public:
     virtual bool canTakeDamage() const{return false;}
     virtual bool canBeShot() const{return false;}
     virtual bool blockRobotVision() const{return false;}
+    void setRobbed(bool robbed) {this->isRobbed = robbed;}
+    bool getRobbed() {return isRobbed;}
+    void changeCoordinates(int &predX, int &predY, int direction);
 private:
     StudentWorld* m_world;
     bool m_dead = false;
     int m_health = 999;
+    bool isRobbed = false;
 };
 
 // Avatar class declaration
@@ -101,6 +105,8 @@ public:
     Exit(double startX, double startY, StudentWorld* world);
     virtual void doSomething();
     virtual bool hiddenExistance() const {return true;}
+private:
+    bool m_isOpen = false;
 };
 
 class Goodies : public Actor {
@@ -174,6 +180,7 @@ public:
     virtual void doSomething();
     virtual bool canSteal() const {return true;}
     virtual void takeDamage();
+    void takeDamageHelper(int increaseScore);
     bool getHasPickedUpGoodie(){return hasPickedUpGoodie;}
     Actor* getGoodie() {return goodie;}
 
@@ -199,7 +206,7 @@ public:
     virtual bool canBeShot() const{return true;}
     virtual bool blockRobotVision() const{return true;}
 private:
-    int m_type;
+    int m_meaness;
 };
 
 class Bullet: public Actor {

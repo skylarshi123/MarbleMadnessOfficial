@@ -171,13 +171,13 @@ Actor* StudentWorld::getActor(int x, int y, Actor* actor) const{
         }
     }
     for (vector<Actor*>::const_iterator it = m_actors.begin(); it != m_actors.end(); ++it) {
-        if ((*it)->getX() == x && (*it)->getY() == y && (*it) != actor && (*it)->isVisible() && (*it)->isEnemy()) {//visible means thief bot did not pick up, careful about the exit which is false
+        if ((*it)->getX() == x && (*it)->getY() == y && (*it) != actor && (*it)->getRobbed() == false && (*it)->isEnemy()) {//visible means thief bot did not pick up, careful about the exit which is false
             // Found an actor at the specified (x, y) location
             return *it;
         }
     }
     for (vector<Actor*>::const_iterator it = m_actors.begin(); it != m_actors.end(); ++it) {
-        if ((*it)->getX() == x && (*it)->getY() == y && (*it) != actor && (*it)->isVisible()) {//visible means thief bot did not pick up
+        if ((*it)->getX() == x && (*it)->getY() == y && (*it) != actor && (*it)->getRobbed() == false) {//visible means thief bot did not pick up
             // Found an actor at the specified (x, y) location
             return *it;
         }
@@ -207,7 +207,7 @@ Actor* StudentWorld::getActorThatCanBeShot(int x, int y, Actor* actor) const{
     }
     //get literaly anything else
     for (vector<Actor*>::const_iterator it = m_actors.begin(); it != m_actors.end(); ++it) {
-        if ((*it)->getX() == x && (*it)->getY() == y && (*it) != actor && (*it)->isVisible()) {
+        if ((*it)->getX() == x && (*it)->getY() == y && (*it) != actor && (*it)->getRobbed()==false) {
             return *it;
         }
     }
