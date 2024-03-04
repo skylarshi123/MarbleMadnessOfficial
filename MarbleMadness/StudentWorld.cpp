@@ -46,6 +46,7 @@ int StudentWorld::move()
             m_actors[i]->doSomething();
             if(getAvatar()->isDead()) {
                 numOfCrystals = 0;
+                resetBonusPoints();
                 return GWSTATUS_PLAYER_DIED;
             }
             
@@ -58,6 +59,7 @@ int StudentWorld::move()
     }
     m_avatar->doSomething();
     if(getAvatar()->isDead()) {
+        resetBonusPoints();
         numOfCrystals = 0;
         return GWSTATUS_PLAYER_DIED;
     }
